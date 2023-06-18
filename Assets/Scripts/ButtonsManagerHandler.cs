@@ -20,6 +20,7 @@ public class ButtonsManagerHandler : MonoBehaviour
     [SerializeField] private List<CustomButton> _buttonList = new List<CustomButton>();
     [SerializeField] private List<ColorForButtons> _buttonsColor = new List<ColorForButtons>();
     [SerializeField] private ScreenAnimations _screenAnimations;
+    [SerializeField] private Button _continueButtonWinScreen;
 
     private List<int> _defaultValues = new List<int>();
     private List<int> _userValues = new List<int>();
@@ -39,6 +40,8 @@ public class ButtonsManagerHandler : MonoBehaviour
         {
             button.GetComponent<Button>().onClick.AddListener(GetButtonValueOnClick);
         }
+
+        _continueButtonWinScreen.onClick.AddListener(ContinueButtonWinScreen_OnClick);
     }
 
     private void OnDestroy()
@@ -47,6 +50,8 @@ public class ButtonsManagerHandler : MonoBehaviour
         {
             button.GetComponent<Button>().onClick.RemoveListener(GetButtonValueOnClick);
         }
+
+        _continueButtonWinScreen.onClick.RemoveListener(ContinueButtonWinScreen_OnClick);
     }
 
 
@@ -159,7 +164,11 @@ public class ButtonsManagerHandler : MonoBehaviour
         {
             Debug.LogError("Win");
             _screenAnimations.WinScreenAnimation_Show();
-            StartNextRound();
         }
+    }
+
+    private void ContinueButtonWinScreen_OnClick()
+    {
+        _screenAnimations.WinScreenAnimation_Hide(StartNextRound);
     }
 }

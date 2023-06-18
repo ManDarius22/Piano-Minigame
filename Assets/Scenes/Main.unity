@@ -1458,7 +1458,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1985121679}
         m_TargetAssemblyTypeName: ButtonsManagerHandler, Assembly-CSharp
-        m_MethodName: VerificareUserInput
+        m_MethodName: UserInputCheck
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1470,7 +1470,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1985121679}
         m_TargetAssemblyTypeName: ButtonsManagerHandler, Assembly-CSharp
-        m_MethodName: VerificareRezultate
+        m_MethodName: ResultCheck
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1737,6 +1737,7 @@ MonoBehaviour:
   - color: {r: 0.23137254, g: 1, b: 0.71108407, a: 1}
   - color: {r: 0.23137254, g: 0.7362234, b: 1, a: 1}
   _screenAnimations: {fileID: 1985121681}
+  _continueButtonWinScreen: {fileID: 757973280}
 --- !u!222 &1985121680
 CanvasRenderer:
   m_ObjectHideFlags: 0

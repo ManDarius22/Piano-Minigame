@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using System;
 
 public class ScreenAnimations : MonoBehaviour
 {
@@ -23,11 +24,12 @@ public class ScreenAnimations : MonoBehaviour
         _winScreenText.DOFade(1f, 1f).SetEase(Ease.OutQuad).From(0);
     }
 
-    public void WinScreenAnimation_Hide()
+    public void WinScreenAnimation_Hide(Action onCompleteCallback)
     {
         _winScreenBackground.DOFade(0f, 1f).SetEase(Ease.OutQuad).From(0.7f);
         _winScreenText.DOFade(0f, 1f).SetEase(Ease.OutQuad).From(1f).OnComplete(()=> {
                 _winScreenBackground.gameObject.SetActive(false);
+                onCompleteCallback?.Invoke();
         });
     }
 }
