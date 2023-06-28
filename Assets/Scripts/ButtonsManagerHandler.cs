@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 using Unity.Mathematics;
 
@@ -21,6 +22,9 @@ public class ButtonsManagerHandler : MonoBehaviour
     [SerializeField] private List<ColorForButtons> _buttonsColor = new List<ColorForButtons>();
     [SerializeField] private ScreenAnimations _screenAnimations;
     [SerializeField] private Button _continueButtonWinScreen;
+    [SerializeField] private Button _continueButtonLoseScreen;
+
+    private string dataFilePath;
 
     private List<int> _defaultValues = new List<int>();
     private List<int> _userValues = new List<int>();
@@ -28,12 +32,15 @@ public class ButtonsManagerHandler : MonoBehaviour
     private bool _correctRound = false;
     private bool _nextRound = true;
     
-    private int _currentRound = 0;
+    private int loadedLevelValue;
 
     private Coroutine _changeColorsCoroutineAfterRound;
 
     private void Start()
     {
+        dataFilePath = Path.Combine(Application.dataPath, "playerLevel.json");
+        LoadData();
+
         _changeColorsCoroutineAfterRound = StartCoroutine(ChangeButtonsColors());
 
         foreach (var button in _buttonList)
@@ -42,6 +49,7 @@ public class ButtonsManagerHandler : MonoBehaviour
         }
 
         _continueButtonWinScreen.onClick.AddListener(ContinueButtonWinScreen_OnClick);
+        _continueButtonLoseScreen.onClick.AddListener(ContinueButtonLoseScreen_OnClick);
     }
 
     private void OnDestroy()
@@ -52,6 +60,7 @@ public class ButtonsManagerHandler : MonoBehaviour
         }
 
         _continueButtonWinScreen.onClick.RemoveListener(ContinueButtonWinScreen_OnClick);
+        _continueButtonLoseScreen.onClick.RemoveListener(ContinueButtonLoseScreen_OnClick);
     }
 
 
@@ -59,13 +68,13 @@ public class ButtonsManagerHandler : MonoBehaviour
     {
         while (true)
         {
-            int _colorChangeCount = BaseColorChangeCount + _currentRound;
+            loadedLevelValue = LoadData();
             int changesPerformed = 0;
 
             yield return new WaitForSeconds(0.5f);
             Shuffle(_buttonList);
 
-            while(changesPerformed < _colorChangeCount)
+            while(changesPerformed < loadedLevelValue)
             {
                 foreach (var button in _buttonList)
                 {
@@ -76,7 +85,7 @@ public class ButtonsManagerHandler : MonoBehaviour
                     yield return new WaitForSeconds(0.5f);
                     changesPerformed++;
 
-                    if(changesPerformed >= _colorChangeCount)
+                    if(changesPerformed >= loadedLevelValue)
                     {
                         break;
                     }
@@ -121,8 +130,6 @@ public class ButtonsManagerHandler : MonoBehaviour
             StopCoroutine(_changeColorsCoroutineAfterRound);
         }
 
-        _currentRound++;
-
         _changeColorsCoroutineAfterRound = StartCoroutine(ChangeButtonsColors());
     }
 
@@ -164,11 +171,56 @@ public class ButtonsManagerHandler : MonoBehaviour
         {
             Debug.LogError("Win");
             _screenAnimations.WinScreenAnimation_Show();
+            SaveData(loadedLevelValue+1);
+        }
+        else
+        {
+            Debug.LogError("Lose");
+            _screenAnimations.LoseScreenAnimation_Show();
+            SaveData(3);
         }
     }
 
     private void ContinueButtonWinScreen_OnClick()
     {
         _screenAnimations.WinScreenAnimation_Hide(StartNextRound);
+    }
+
+    private void ContinueButtonLoseScreen_OnClick()
+    {
+        _screenAnimations.LoseScreenAnimation_Hide(StartNextRound);
+    }
+
+    public int LoadData()
+    {
+        if (File.Exists(dataFilePath))
+        {
+            string json = File.ReadAllText(dataFilePath);
+            SaveLevel data = JsonUtility.FromJson<SaveLevel>(json);
+            return data.levelValue;
+        }
+        else
+        {
+            CreateDefaultDataFile();
+            return 0; // Default value if the file doesn't exist
+        }
+    }
+
+    public void SaveData(int value)
+    {
+        SaveLevel data = new SaveLevel();
+        data.levelValue = value;
+
+        string json = JsonUtility.ToJson(data);
+        File.WriteAllText(dataFilePath, json);
+    }
+
+    private void CreateDefaultDataFile()
+    {
+        SaveLevel defaultData = new SaveLevel();
+        defaultData.levelValue = 3;
+
+        string json = JsonUtility.ToJson(defaultData);
+        File.WriteAllText(dataFilePath, json);
     }
 }

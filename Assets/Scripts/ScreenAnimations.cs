@@ -8,8 +8,13 @@ using System;
 
 public class ScreenAnimations : MonoBehaviour
 {
+    [Header("Win Screen")]
     [SerializeField] private Image _winScreenBackground;
     [SerializeField] private TextMeshProUGUI _winScreenText;
+
+    [Header("Lose Screen")]
+    [SerializeField] private Image _loseScreenBackground;
+    [SerializeField] private TextMeshProUGUI _loseScreenText;
 
     private void OnDestroy()
     {
@@ -30,6 +35,22 @@ public class ScreenAnimations : MonoBehaviour
         _winScreenText.DOFade(0f, 1f).SetEase(Ease.OutQuad).From(1f).OnComplete(()=> {
                 _winScreenBackground.gameObject.SetActive(false);
                 onCompleteCallback?.Invoke();
+        });
+    }
+
+    public void LoseScreenAnimation_Show()
+    {
+        _loseScreenBackground.gameObject.SetActive(true);
+        _loseScreenBackground.DOFade(0.7f, 1f).SetEase(Ease.OutQuad).From(0);
+        _loseScreenText.DOFade(1f, 1f).SetEase(Ease.OutQuad).From(0);
+    }
+
+    public void LoseScreenAnimation_Hide(Action onCompleteCallback)
+    {
+        _loseScreenBackground.DOFade(0f, 1f).SetEase(Ease.OutQuad).From(0.7f);
+        _loseScreenText.DOFade(0f, 1f).SetEase(Ease.OutQuad).From(1f).OnComplete(() => {
+            _loseScreenBackground.gameObject.SetActive(false);
+            onCompleteCallback?.Invoke();
         });
     }
 }
